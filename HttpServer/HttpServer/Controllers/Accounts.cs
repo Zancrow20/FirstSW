@@ -1,8 +1,6 @@
-﻿using System.Data.SqlClient;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using HttpServer.Attributes;
+﻿using HttpServer.Attributes;
 using HttpServer.Models;
+using HttpServer.ORM;
 
 namespace HttpServer.Controllers;
 
@@ -10,31 +8,52 @@ namespace HttpServer.Controllers;
 [HttpController("accounts")]
 public class Accounts
 {
-    [HttpGET("")]
-    public List<Account> GetUsers()
-                                         
-    {
-        string connectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=master;Integrated Security=True";
-        var users = DBLogic.GetUsers(connectionString);
+    //TODO добавить обработку SqlExceptions
+    private readonly AccountRepository _accountRepo;
         
-        return users;
+    public Accounts() => _accountRepo = new AccountRepository();
+
+    [HttpGET("")]
+    public async Task<List<Account>?> GetAccounts(string? cookie)
+    {
+        try
+        {
+            var cookieInfo = cookie?.Split('=')[^1];
+            if (Guid.TryParse(cookieInfo, out var guid) && await SessionManager.CheckSession(guid))
+                return await _accountRepo.GetAccounts();
+        }
+        catch (KeyNotFoundException e)
+        {
+            return null;
+        }
+        
+        return null;
     }
 
-    [HttpGET("[1-9][0-9]*$")]
-    public Account GetUserById(int id)
+    [HttpGET("[1-9][0-9]+")]
+    public async Task<Account?> GetAccountInfo(string cookie)
     {
-        
-        string connectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=SteamDB;Integrated Security=True";
-        Account user = DBLogic.GetUserById(connectionString, id);
-        return user;
+        try
+        { 
+            var cookieInfo = cookie.Split('=')[^1];
+            if (Guid.TryParse(cookieInfo, out var guid) && await SessionManager.CheckSession(guid))
+                return await _accountRepo.GetById((await SessionManager.GetInfo(guid))!.AccountId);
+        }
+        catch (KeyNotFoundException e)
+        {
+            return null;
+        }
+        return null;
     }
     
-    [HttpPOST("/account$")]
-    public void SaveUser(string query)
+    [HttpPOST("account")]
+    public async Task<SessionId> Login(string nickname, string password)
     {
-        var accountData = query.Split('&')
-            .Select(pair => pair.TrimStart('=')).ToArray();
-        string connectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=SteamDB;Integrated Security=True";
-        DBLogic.SaveUser(connectionString, accountData[0], accountData[1]);
+        var account = await _accountRepo.GetAccountByProperties(nickname, password);
+        if (account == null) return null;
+        var sessionId = new SessionId(account.Id, nickname,password);
+        var session = await SessionManager.GetOrAdd(account.Id, () 
+            => Task.FromResult(new Session(sessionId.Guid, account.Id, nickname, DateTime.Now)));
+        return sessionId;
     }
 }

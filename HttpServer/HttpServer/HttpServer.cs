@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using HttpServer.Attributes;
-using System;
+using System.Text.RegularExpressions;
 
 namespace HttpServer;
 
@@ -20,6 +20,8 @@ public class Response
    public byte[] Buffer { get; set; }
    public HttpStatusCode StatusCode { get; set; }
    public string? Content { get; set; }
+
+   public Cookie? Cookie { get; set; }
 }
 
 
@@ -90,22 +92,20 @@ public class HttpServer : IDisposable
    {
       while (_serverStatus == ServerStatus.Start)
       {
-         HttpListenerContext context = await _listener.GetContextAsync();
-         HttpListenerRequest request = context.Request;
+         var context = await _listener.GetContextAsync();
+         var request = context.Request;
 
-         HttpListenerResponse response = context.Response;
+         var response = context.Response;
 
          var methodHandled = MethodHandler(context);
          if (await methodHandled)
          {
             response.Headers.Set(HttpResponseHeader.ContentType, ResponseInfo.Content);
             response.StatusCode = (int) ResponseInfo.StatusCode;
+            if(ResponseInfo.Cookie != null)
+               response.SetCookie(ResponseInfo.Cookie);
 
-            if (response.StatusCode == (int) HttpStatusCode.Redirect)
-               response.Headers.Set(HttpResponseHeader.Location,
-                  "https://store.steampowered.com/login/?redir=&redir_ssl=1&snr=1_4_4__global-header");
-
-            using var output = response.OutputStream;
+            await using var output = response.OutputStream;
             output.Write(ResponseInfo.Buffer);
          }
          else
@@ -134,7 +134,7 @@ public class HttpServer : IDisposable
       }
 
       response.ContentLength64 = buffer.Length;
-      Stream output = response.OutputStream;
+      var output = response.OutputStream;
       await output.WriteAsync(buffer);
 
       output.Close();
@@ -173,40 +173,26 @@ public class HttpServer : IDisposable
    private async Task<bool> MethodHandler(HttpListenerContext httpContext)
    {
       // объект запроса
-      HttpListenerRequest request = httpContext.Request;
+      var request = httpContext.Request;
 
       // объект ответа
-      HttpListenerResponse response = httpContext.Response;
+      var response = httpContext.Response;
 
       if (request.Url?.Segments.Length < 2) return false;
 
       var uri = string.Join("", request.Url?.Segments!);
       var controllerName = uri.Split('/')[1];
       var httpMethod = $"Http{httpContext.Request.HttpMethod}";
-      
-      Stream body = request.InputStream;
-      Encoding encoding = request.ContentEncoding;
-      using StreamReader reader = new StreamReader(body, encoding);
-      var str = await reader.ReadToEndAsync();
-
-      var strParams = httpContext.Request.Url?
-         .Segments
-         .Skip(2)
-         .Select(s => s.Replace("/", ""))
-         .ToList();
-      strParams?.Add(str);
-
+      var inputParams = ParseQuery(await GetQueryStringAsync(request));
       var assembly = Assembly.GetExecutingAssembly();
 
       var controller = assembly
          .GetTypes()
          .Where(t => Attribute.IsDefined(t, typeof(HttpController)))
-         .FirstOrDefault(c => c.Name.ToLower() == controllerName?.ToLower());
+         .FirstOrDefault(c 
+            => string.Equals(c.Name, controllerName, StringComparison.CurrentCultureIgnoreCase));
 
-      if (controller == null) return false;
-      
-      var method = controller
-         .GetMethods()
+      var method = controller?.GetMethods()
          .FirstOrDefault(method =>
          {
             var attribute = method.CustomAttributes
@@ -215,28 +201,87 @@ public class HttpServer : IDisposable
             var methodUri = attribute.AttributeType
                .GetProperty("MethodUri")
                ?.GetValue(method.GetCustomAttribute(attribute.AttributeType))?
-               .ToString() ?? "";
-            var httpMethodUri = request.Url?.AbsolutePath.Split('/')[2];
-            if (httpMethodUri == null) return false;
-            return httpMethodUri == methodUri;
+               .ToString();
+            var httpMethodUri = request.Url?.AbsolutePath.Split('/')[^1];
+            
+            if (methodUri == string.Empty)
+               return httpMethodUri == methodUri;
+            
+            return Regex.IsMatch(httpMethodUri, methodUri);
          });
       
-      if (method == null) return false;
-
-      object?[] queryParams = method.GetParameters()
+      if (method is null) return false;
+      
+      var strParams = new List<string>();
+      switch (httpMethod)
+      {
+         case "HttpGET" when method.Name is not "GetAccountInfo" :
+            strParams.AddRange(httpContext.Request.Url?
+               .Segments
+               .Skip(2)
+               .Select(s => s.Replace("/", ""))
+               .ToList() ?? new List<string>());
+            break;
+         case "HttpPOST":
+            strParams.AddRange(inputParams);
+            break;
+      }
+      
+      if (method.Name is "GetAccounts" or "GetAccountInfo")
+      {
+         var cookieValue = request.Cookies["SessionId"] != null ? 
+            request.Cookies["SessionId"]?.Value : "";
+         strParams.Add(cookieValue!);
+      }
+      
+      var queryParams = method.GetParameters()
          .Select((p, i) => Convert.ChangeType(strParams?[i], p.ParameterType))
          .ToArray();
 
-      var ret = method.Invoke(Activator.CreateInstance(controller), queryParams);
-
-      byte[] buffer = Encoding.ASCII.GetBytes(JsonSerializer.Serialize(ret));
+      var task = (Task)method.Invoke(Activator.CreateInstance(controller), queryParams) as dynamic;
+      object? returnedValue = await task!;
+      
+      var buffer = returnedValue switch
+      {
+         not null => Encoding.ASCII.GetBytes(JsonSerializer.Serialize(returnedValue)),
+         null when method.Name is "GetAccounts" or "GetAccountInfo" 
+            => Encoding.ASCII.GetBytes("401 - not authorized"),
+         null => Encoding.ASCII.GetBytes("404 - not found")
+      };
+      
       response.ContentLength64 = buffer.Length;
 
-      ResponseInfo = ret == null ? 
-         new Response {Buffer = buffer, Content = "Application/json", StatusCode = HttpStatusCode.Redirect} : 
-         new Response {Buffer = buffer, Content = "Application/json", StatusCode = HttpStatusCode.OK};
+      ResponseInfo = returnedValue switch
+      {
+         not null when method.Name is "Login" => GetLoginResponse(returnedValue, buffer),
+         not null => new Response {Buffer = buffer, Content = "Application/json", StatusCode = HttpStatusCode.OK},
+         null when method.Name is "GetAccounts" or "GetAccountInfo"=> 
+            new Response {Buffer = buffer, Content = "Application/json", StatusCode = HttpStatusCode.Unauthorized},
+         null => new Response {Buffer = buffer, Content = "Application/json", StatusCode = HttpStatusCode.OK}
+      };
+      
       return true;
    }
 
+   private static Response GetLoginResponse(object returnedValue, byte[] bytes)
+   {
+      var sessionId = (SessionId) returnedValue;
+      var cookie = new Cookie("SessionId",
+         $"Guid={sessionId.Guid}");
+      return new Response { Buffer = bytes, Content = "Application/json", StatusCode = HttpStatusCode.OK, Cookie = cookie};
+   }
+   
+   private static async Task<string> GetQueryStringAsync(HttpListenerRequest request)
+   {
+      var body = request.InputStream;
+      var encoding = request.ContentEncoding;
+      using var reader = new StreamReader(body, encoding);
+      return await reader.ReadToEndAsync();
+   }
+
+   private static IEnumerable<string> ParseQuery(string query)
+      => query.Split('&')
+         .Select(pair => pair.Split('=')[^1]);
+   
    public void Dispose() => Stop();
 }

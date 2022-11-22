@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="Microsoft SQL Server LocalDB (JetBrains)" uuid="99281bff-2202-4740-959d-ad5882d14a57">
-      <driver-ref>sqlserver.localdb.jb</driver-ref>
+    <data-source source="LOCAL" name="ORIS" uuid="99281bff-2202-4740-959d-ad5882d14a57">
+      <driver-ref>sqlserver.jb</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.jetbrains.jdbc.sqlserver.SqlServerDriver</jdbc-driver>
-      <jdbc-url>Server=(localdb)\MSSQLLocalDB</jdbc-url>
+      <jdbc-url>Server=DESKTOP-Q9MBLGB\SQLEXPRESS;Database=SteamDB</jdbc-url>
       <jdbc-additional-properties>
         <property name="LOCAL_DB_INSTANCE" value="MSSQLLocalDB" />
       </jdbc-additional-properties>

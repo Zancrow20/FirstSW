@@ -1,0 +1,104 @@
+*, ::after, ::before 
+    box-sizing: border-box
+    font-size: 12px
+
+a 
+    text-decoration: none
+    color: #f3f3f0
+
+ul
+    padding: 0
+
+ol ol, ol ul, ul ol, ul ul 
+    margin-bottom: 0
+
+body 
+    height: 100%
+    font-family: "Mulish", sans-serif
+    -webkit-font-smoothing: antialiased
+    background: #0b0c2a
+ 
+.header  
+    background: #070720
+    position: relative
+    a
+        text-decoration: none
+    &_logo
+        padding: 10px 0 17px
+    .container
+        max-width: 960px
+        width: 100%
+        padding-right: 15px
+        padding-left: 15px
+        margin-right: auto
+        margin-left: auto
+    .row
+        height: 40px
+        display: flex
+        justify-content: space-between
+        margin-right: -15px
+        margin-left: -15px
+        >*
+            width: auto
+            height: 40px
+    &_nav
+        height: 100%
+    &_menu
+        height: 100%
+        ul
+            align-items: center
+            justify-content: space-between
+            height: 100%
+            display: flex
+            .active
+                background-color: red
+            li
+                list-style: none
+                display: inline-block
+                position: relative
+                height: 100%
+                a                
+                    align-items: center
+                    font-size: 13px
+                    color: #b7b7b7
+                    display: flex
+                    font-weight: 700
+                    transition: all, 0.5s
+                    height: 100%
+                    padding: 0 15px
+                .dropdown
+                    color: black
+                    display: flex
+                    flex-wrap: wrap
+                    position: absolute  
+                    left: 0
+                    top: 82px
+                    width: 150px
+                    background: #ffffff
+                    text-align: left
+                    padding: 5px 0
+                    z-index: 9
+                    opacity: 0
+                    visibility: hidden
+                    transition: all, 0.3s
+                    li
+                        display: block
+                        margin-right: 0
+                        a
+                            font-size: 14px
+                            color: #111111
+                            font-weight: 500
+                            padding: 5px 20px
+    &_right
+        text-align: right
+        padding: auto 0
+        a
+            text-decoration: none
+            display: inline-block
+            font-size: 18px
+            color: #ffffff
+            margin-right: 10
+            
+        img
+            width: 20px
+            height: 20px    

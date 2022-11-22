@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AniWatch</title>
+    <link rel="stylesheet" href="../css/style.min.css" type="text/css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+</head>
+<body>
+    <!-- Header Section Begin -->
+    <header class="header">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-2">
+                    <div class="header_logo">
+                        <a href="./index.html">
+                            <img src="../img/logo.svg" alt="logo.svg">
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-8">
+                    <div class="header_nav">
+                        <nav class="header_menu mobile-menu">
+                            <ul>
+                                <li class="active">
+                                    <a href="./index.html">Homepage</a>
+                                </li>
+                                <li>
+                                    <a href="./categories.html">Categories <span class="arrow_carrot-down"></span></a>
+                                    <ul class="dropdown">
+                                        <li><a href="./anime.html">Anime</a></li>
+                                        <li><a href="./completed.html">Completed</a></li>
+                                        <li><a href="./ongoing.html">Ongoing</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="./best.html">The best</a></li>
+                                <li>
+                                    <a href="./blog.html">Our Blog</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+                <div class="col-lg-2">
+                    <div class="header_right">
+                        <a href="#" class="search-switch">
+                            <span class="header_right_search">
+                                <img src="../icons/icons8-search.svg" alt="search.svg">
+                        </span></a><!-- Попробуй сделать поисковик -->
+                        <a href="./login.html"><span class="header_right_profile">
+                            <img src="../icons/icons8-profile-face-64.png" alt="icon_profile.png">
+                        </span></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- Header End -->
+    <!-- Hero Section Begin -->
+    <section class="hero"></section>
+    <!-- Hero Section End -->
+    <!-- Product Section Begin -->
+    <section class="product spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="trending_product"><!-- Это тоже моэно размножить с помощью scriban -->
+                        <div class="row">
+                            <div class="col-lg-8 col-md-8 col-sm-8">
+                                <div class="title">
+                                    <h4>
+                                        Trending Now
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-4">
+                                <div class="btn_all">
+                                    <a href="./categories.html">View all</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <!-- Это можно размножить с помощью scriban -->
+                            <div class="col-lg-4 col-md-6 col-sm-6">
+                                <div class="product__item">
+                                    <div class="product__item__pic set-bg" data-setbg="img/trending/trend-1.jpg<!-- Бери из Resources -->" style="background-image: url(&quot;img/trending/trend-1.jpg&quot;);<!-- Тоже из Resources -->">
+                                        <div class="ep">18 / 18 <!-- Это тоже из БД --></div>
+                                        <div class="comment"><i class="fa fa-comments"></i> 11 <!-- Это тоже из БД --></div>
+                                        <div class="view"><i class="fa fa-eye"></i> <!-- Если в бд я сделал колво просмотров, то беру оттуда --></div>
+                                    </div>
+                                    <div class="product__item__text">
+                                        <ul>
+                                            <li>Active</li>
+                                            <li>Movie</li>
+                                            <!-- Это тоже из БД -->
+                                        </ul>
+                                        <h5><a href="./anime-page.html"><!-- Доставай имя из бд --></a></h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="classic_product">
+
+                    </div>
+                    <div class="recent_product">
+
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-8">
+                    
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Product Section End -->
+    <!-- Footer Section Begin -->
+    <footer class="footer"></footer>
+
+    <div class="search-model" style="display: block;">
+        <div class="h-100 d-flex align-items-center justify-content-center">
+            <div class="search-close-switch"><i class="icon_close"></i></div>
+            <form class="search-model-form">
+                <input type="text" id="search-input" placeholder="Search here.....">
+            </form>
+        </div>
+    </div>
+</body>
+</html>
