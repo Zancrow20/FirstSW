@@ -11,5 +11,15 @@
       </jdbc-additional-properties>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="AnimeWebsite@DESKTOP-Q9MBLGB" uuid="33638f2d-f103-4906-9bd6-76d2d603f4ab">
+      <driver-ref>sqlserver.jb</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.jetbrains.jdbc.sqlserver.SqlServerDriver</jdbc-driver>
+      <jdbc-url>Server=DESKTOP-Q9MBLGB\SQLEXPRESS;Database=AnimeWebsite</jdbc-url>
+      <jdbc-additional-properties>
+        <property name="LOCAL_DB_INSTANCE" value="MSSQLLocalDB" />
+      </jdbc-additional-properties>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>

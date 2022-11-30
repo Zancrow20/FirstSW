@@ -3,6 +3,8 @@
 public record class AnimeInfo
 {
     public int Anime_Id { get; init; } //not null identity(100,1),
+    public string Anime_Name { get; set; }
+    public string? Description { get; set; }
     public string? Author { get; set; } //
     public string? Studio { get; set; } //
     public string? Genre { get; set; } //not null default 'Сенён'

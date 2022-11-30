@@ -2,16 +2,16 @@
 
 public class Session
 {
-    public int AccountId { get; }
+    public int UserId { get; }
     public Guid Guid { get; set; }
-    public string Nickname { get; }
+    public string Email { get; }
     public DateTime CreateDateTime { get; }
 
-    public Session(Guid guid,int accountId, string nickname, DateTime createDateTime)
+    public Session(Guid guid,int userId, string email)
     {
         Guid = guid;
-        AccountId = accountId;
-        Nickname = nickname;
-        CreateDateTime = createDateTime;
+        UserId = userId;
+        Email = email;
+        CreateDateTime = DateTime.Now;
     }
 }
