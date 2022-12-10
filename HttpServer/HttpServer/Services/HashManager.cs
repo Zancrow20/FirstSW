@@ -19,8 +19,6 @@ public class HashManager
 
         return result;
 
-        //return new Guid().ToString();
-
     }
 
     public static string GetSHA256(string saltedPassword)

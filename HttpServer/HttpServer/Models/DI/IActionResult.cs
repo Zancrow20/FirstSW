@@ -6,7 +6,7 @@ public interface IActionResult
 {
     HttpStatusCode StatusCode { get; set; }
     byte[] Buffer { get; set; }
-    string Template { get; set; }
+    string Location { get; set; }
     Cookie Cookie { get; set; }
     string ContentType { get; set; }
 }

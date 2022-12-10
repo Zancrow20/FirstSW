@@ -1,36 +1,30 @@
-﻿namespace HttpServer.ORM;
+﻿using HttpServer.Models;
 
-public class AnimeInfoRepo : IRepository<AnimeInfoRepo>
+namespace HttpServer.ORM;
+
+public class AnimeInfoRepo : IRepository<AnimeInfo>
 {
     private static readonly ORM DB = new
         (@"Data Source=DESKTOP-Q9MBLGB\SQLEXPRESS;Initial Catalog=AnimeWebsite;Integrated Security=True");
 
-    public Task<AnimeInfoRepo?> GetById(int id)
+    public async Task<AnimeInfo?> GetById(AnimeInfo info)
+        => await DB.Select<AnimeInfo>(info.Id);
+
+    public async Task<int> Create(AnimeInfo entity)
+        => await DB.Insert(entity);
+
+    public async Task<int> Update(AnimeInfo entity)
+        => await DB.Update(entity);
+
+    public async Task<int> Delete(AnimeInfo entity)
+        => await DB.Delete(entity);
+
+    public async Task<IEnumerable<AnimeInfo>> GetEntities()
     {
         throw new NotImplementedException();
     }
 
-    public Task<int> Create(AnimeInfoRepo entity)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<int> Update(AnimeInfoRepo entity)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<int> Delete(AnimeInfoRepo entity)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<IEnumerable<AnimeInfoRepo>> GetEntities()
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<AnimeInfoRepo> GetEntityByProperties(params object[] properties)
+    public async Task<AnimeInfo> GetEntityByProperties(AnimeInfo animeInfo)
     {
         throw new NotImplementedException();
     }

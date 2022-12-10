@@ -1,9 +1,10 @@
 ﻿namespace HttpServer.Models;
 
-public class Comment
+public record class Comment
 {
-    /*user_id int not null check(user_id > 0),
-    anime_id int not null check(anime_id > 0),
-    comment_id int not null check(comment_id > 0),
-    comment varchar(200) default null,*/
+    public int User_Id { get; set; }
+    public int Id { get; set; }
+    public int Comment_Id { get; set; }
+    public string Comment_Value { get; set; }
+    public string Username { get; set; }
 }

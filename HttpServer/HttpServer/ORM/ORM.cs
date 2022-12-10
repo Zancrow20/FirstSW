@@ -89,8 +89,7 @@ public class ORM
 
     public async Task<int> Insert<T>(T entity)
     {
-        var args = GetProperties(entity);
-            //.Where(info => info.Name != "id");
+        var args = GetProperties(entity).Where(info => info.Name.ToLower() != "id");
         var names = args.Select(value => value.Name.ToLower());
         var parameters = names.Select(value => "@" + value);
         foreach (var parameter in args)
@@ -104,10 +103,19 @@ public class ORM
         return await ExecuteNonQuery<T>(nonQuery);
     }
 
-    public async Task<int> Insert<T>(params object[] args)
+    public async Task<int> InsertWithId<T>(T entity)
     {
-        var values = args.Select(value => $"@{value}").ToArray();
-        var nonQuery = $"INSERT INTO {typeof(T).Name} VALUES ({string.Join(", ", values)})";
+        var args = GetProperties(entity);
+        var names = args.Select(value => value.Name.ToLower());
+        var parameters = names.Select(value => "@" + value);
+        foreach (var parameter in args)
+        {
+            var sqlParameter = new SqlParameter($"@{parameter.Name.ToLower()}", parameter.GetValue(entity));
+            _command.Parameters.Add(sqlParameter);
+        }
+
+        var nonQuery = 
+            $"INSERT INTO {typeof(T).Name} ({string.Join(", ", names)}) VALUES ({string.Join(", ", parameters)})";
         return await ExecuteNonQuery<T>(nonQuery);
     }
 

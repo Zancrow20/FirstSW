@@ -7,7 +7,7 @@ public class FavouriteRepo : IRepository<Favourite>
     private static readonly ORM DB = new
         (@"Data Source=DESKTOP-Q9MBLGB\SQLEXPRESS;Initial Catalog=AnimeWebsite;Integrated Security=True");
 
-    public Task<Favourite?> GetById(int id)
+    public Task<Favourite?> GetById(Favourite favourite)
     {
         throw new NotImplementedException();
     }
@@ -32,7 +32,7 @@ public class FavouriteRepo : IRepository<Favourite>
         throw new NotImplementedException();
     }
 
-    public Task<Favourite> GetEntityByProperties(params object[] properties)
+    public Task<Favourite> GetEntityByProperties(Favourite favourite)
     {
         throw new NotImplementedException();
     }

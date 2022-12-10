@@ -7,32 +7,22 @@ public class CommentRepo : IRepository<Comment>
     private static readonly ORM DB = new
         (@"Data Source=DESKTOP-Q9MBLGB\SQLEXPRESS;Initial Catalog=AnimeWebsite;Integrated Security=True");
 
-    public Task<Comment?> GetById(int id)
-    {
-        throw new NotImplementedException();
-    }
+    public async Task<Comment?> GetById(Comment comment)
+        => await DB.Select<Comment>(comment.Id);
 
-    public Task<int> Create(Comment entity)
-    {
-        throw new NotImplementedException();
-    }
+    public async Task<int> Create(Comment entity)
+        => await DB.InsertWithId(entity);
 
-    public Task<int> Update(Comment entity)
-    {
-        throw new NotImplementedException();
-    }
+    public async Task<int> Update(Comment entity)
+        => await DB.Update(entity);
 
-    public Task<int> Delete(Comment entity)
-    {
-        throw new NotImplementedException();
-    }
+    public async Task<int> Delete(Comment entity)
+        => await DB.Delete(entity);
 
-    public Task<IEnumerable<Comment>> GetEntities()
-    {
-        throw new NotImplementedException();
-    }
+    public async Task<IEnumerable<Comment>> GetEntities()
+        => await DB.Select<Comment>();
 
-    public Task<Comment> GetEntityByProperties(params object[] properties)
+    public async Task<Comment> GetEntityByProperties(Comment comment)
     {
         throw new NotImplementedException();
     }

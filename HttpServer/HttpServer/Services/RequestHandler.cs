@@ -13,18 +13,23 @@ public class RequestHandler
     {
         Server = server;
     }
-    public void HandleRequests(string? request)
+    public async Task HandleRequests(string? request)
     {
-        if (request == "start")
-            Server.Start();
-        if (request == "stop")
-            Server.Stop();
-        if (request == "restart")
+        switch (request)
         {
-            Server.Stop();
-            Server.Start();
+            case "start":
+                await Server.Start();
+                break;
+            case "stop":
+                Server.Stop();
+                break;
+            case "restart":
+                Server.Stop();
+                await Server.Start();
+                break;
+            case "exit":
+                KeepRunning = false;
+                break;
         }
-        if (request == "exit")
-            KeepRunning = false;
     }
 }

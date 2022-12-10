@@ -1,0 +1,130 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AniWatch</title>
+    <link rel="stylesheet" href="/css/style.min.css" type="text/css">
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <link rel="stylesheet" href="/css/reset.css" type="text/css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+
+</head>
+<body>
+<!-- Header Section Begin -->
+<header class="header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-2 col-md-3 col-sm-3">
+                <div class="header_logo">
+                    <a href="../all/">
+                        <img src="/icons/AnimeLogo.png" alt="AnimeLogo.png" height="44" width="120">
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-8 col-md-6 col-sm-6">
+                <div class="header_nav">
+                    <nav class="header_menu mobile-menu">
+                        <ul>
+                            <li class="active"><a href="../all/">Homepage</a></li>
+                            <li><a href="../random/">Random Anime</a></li>
+                            <li><a href="../completed/">Completed</a></li>
+                            <li><a href="../ongoing/">Ongoing</a></li>
+                            <li><a href="../best/">The best</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-6 col-sm-6">
+                <div class="header_right">
+                    <a href="/accounts/login-page/">
+                            <span class="header_right_profile">
+                                <img src="/icons/user.png" alt="icon_profile.png">
+                            </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+<!-- Header End -->
+<!-- Product Section Begin -->
+<section class="product spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2">
+                <div class="trending_product">
+                    <div class="row">
+                        <div class="col-lg-8 col-md-8 col-sm-8">
+                            <div class="title">
+                                <h4>
+                                    {{Status}}
+                                </h4>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        {{- for Anime in Series}}
+                        <div class="col-lg-4 col-md-6 col-sm-6">
+                            <div class="product__item" id="{{Anime.Anime_Name}}">
+                                <a href="../anime-page/{{Anime.Anime_Id}}">
+                                    <div class="product__item__pic set-bg" style="background-image: url('/img/poster/{{Anime.Image_Path}}')">
+                                        <div class="rating"><i class="fa-solid fa-star"></i>{{Anime.Average_Rating}}</div>
+                                        <div class="count-of-estimations"><i class="fa-solid fa-thumbs-up"></i>{{Anime.Count_Of_Estimations}}</div>
+                                    </div>
+                                </a>
+
+                                <div class="product__item__text">
+                                    {{ if Anime.Is_Ongoing }}
+                                    <h6>Ongoing</h6>
+                                    {{ else }}
+                                    <h6>Completed</h6>
+                                    {{ end }}
+                                    <h5><a href="../anime-page/{{Anime.Anime_Id}}/">{{Anime.Anime_Name}}</a></h5>
+                                </div>
+                            </div>
+                        </div>
+                        {{- end}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Product Section End -->
+<!-- Footer Section Begin -->
+<footer class="footer">
+    <div class="page-up">
+        <a href="#" id="scrollToTopButton"><i class="fa-solid fa-arrow-up"></i></a>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="footer__logo">
+                    <a href="../all/"><img src="/icons/AnimeLogo.png" alt=""></a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="footer__nav">
+                    <ul>
+                        <li class="active"><a href="../all/">Homepage</a></li>
+                        <li><a href="../ongoing/">Ongoing</a></li>
+                        <li><a href="../best/">Best</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <p><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                    Copyright ©<script>document.write(new Date().getFullYear());</script>2022 All rights reserved | This template is made with <i class="fa fa-heart" aria-hidden="true"></i> by <a href="../all/" target="_blank">AnimeWatch</a>
+                    <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></p>
+
+            </div>
+        </div>
+    </div>
+</footer>
+<script src="https://kit.fontawesome.com/5a2eab6f6d.js" crossorigin="anonymous"></script>
+<!-- Footer Section End -->
+</body>
+</html>

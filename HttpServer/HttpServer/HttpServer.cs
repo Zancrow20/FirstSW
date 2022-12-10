@@ -8,6 +8,7 @@ using HttpServer.Controllers;
 using HttpServer.Models;
 using HttpServer.Models.DI;
 using HttpServer.Services;
+using static System.GC;
 
 namespace HttpServer;
 
@@ -62,11 +63,10 @@ public class HttpServer : IDisposable
          Console.WriteLine("settings.json not found");
       
       _listener.Prefixes.Add($"http://localhost:{_settings?.Port}/");
-      Console.WriteLine("Запуск сервера...");
+      Console.WriteLine($"Running at {_settings?.Port} port");
       _listener.Start();
 
       _serverStatus = ServerStatus.Start;
-      Console.WriteLine("Сервер запущен");
 
       await ListenAsync();
    }
@@ -75,11 +75,11 @@ public class HttpServer : IDisposable
    {
       if (_serverStatus == ServerStatus.Stop) return;
 
-      Console.WriteLine("Остановка сервера...");
+      Console.WriteLine("Stop server");
       _listener.Stop();
 
       _serverStatus = ServerStatus.Stop;
-      Console.WriteLine("Сервер остановлен");
+      Console.WriteLine("Server stopped");
    }
 
    private async Task ListenAsync()
@@ -89,55 +89,45 @@ public class HttpServer : IDisposable
          try
          {
             var context = await _listener.GetContextAsync();
-            var methodHandled = MethodHandler(context);
-            if (!await methodHandled) await StaticProvider.GetPage(context, _settings);
+            var response = context.Response;
+            var request = context.Request;
+            var returnedValue = await MethodHandler(context);
+            if (returnedValue == null)
+            {
+               await StaticProvider.GetPage(context, _settings);
+               continue;   
+            } 
+            response.ContentLength64 = returnedValue.Buffer.Length;
+            response.StatusCode = (int) returnedValue.StatusCode;
+            if (returnedValue.Location != null)
+               response.Headers.Add("Location", returnedValue.Location);
+            if (returnedValue.Cookie != null)
+            {
+               //request.Cookies.Add(returnedValue.Cookie);
+               response.Cookies.Add(returnedValue.Cookie);
+            }
+            response.Headers.Set(HttpResponseHeader.ContentType, returnedValue.ContentType);
+            await using var output = response.OutputStream;
+            await output.WriteAsync(returnedValue.Buffer);
          }
          catch (Exception e)
          {
             Console.WriteLine(e);
          }
-         
-         /*{
-            /*response.Headers.Set(HttpResponseHeader.ContentType, ResponseInfo.Content);
-            response.StatusCode = (int) ResponseInfo.StatusCode;
-            if (ResponseInfo.Cookie != null)
-               response.SetCookie(ResponseInfo.Cookie);
-            if (ResponseInfo.Buffer == null)
-            {
-               await MethodHandler(context);
-               continue;
-            }
-            response.ContentLength64 = ResponseInfo.Buffer.Length;
-            await using var output = response.OutputStream;
-            await output.WriteAsync(ResponseInfo.Buffer);
-         }*/
-            
       }
    }
    
 
-   private async Task<bool> MethodHandler(HttpListenerContext httpContext)
+   private async Task<IActionResult?> MethodHandler(HttpListenerContext httpContext)
    {
       var request = httpContext.Request;
-      
       var response = httpContext.Response;
+      
       var uri = string.Join("", request.Url.Segments!);
-      
-      if (request.Url?.Segments.Length < 1 || uri == "/")
-      {
-         ResponseInfo = new Response
-         {
-            StatusCode = HttpStatusCode.Redirect,
-            Content = "text/html",
-         };
-         response.Headers.Set("Location","/anime/");
-         return false;
-      }
-
-      
       var controllerName = uri.Split('/')[1];
       var httpMethod = $"Http{httpContext.Request.HttpMethod}";
       var inputParams = await GetQueryStringAsync(request);
+      
       var assembly = Assembly.GetExecutingAssembly();
 
       var controller = assembly
@@ -164,7 +154,7 @@ public class HttpServer : IDisposable
                .GetProperty("MethodUri")
                ?.GetValue(method.GetCustomAttribute(attribute.AttributeType))?
                .ToString();
-            var httpMethodUri = request.Url?.AbsolutePath.Split('/',StringSplitOptions.RemoveEmptyEntries)[^1];
+            var httpMethodUri = request.Url?.AbsolutePath.Split('/',StringSplitOptions.RemoveEmptyEntries)[1];
             
             if (methodUri == string.Empty)
                return httpMethodUri == methodUri;
@@ -172,12 +162,12 @@ public class HttpServer : IDisposable
             return Regex.IsMatch(httpMethodUri, methodUri);
          });
       
-      if (method is null) return false;
+      if (method is null) return null;
       
       var objParams = new List<object?> {httpContext};
       switch (httpMethod)
       {
-         case "HttpGET" when method.Name is not "GetAccountInfo" :
+         case "HttpGET":
             objParams.AddRange(httpContext.Request.Url?
                .Segments
                .Where(segment => segment != "/")
@@ -189,56 +179,16 @@ public class HttpServer : IDisposable
             objParams.AddRange(inputParams);
             break;
       }
-      
-      if (method.Name is "GetAccounts" or "GetAccountInfo")
-      {
-         var cookieValue = request.Cookies["SessionId"] != null ? 
-            request.Cookies["SessionId"]?.Value : "";
-         objParams.Add(cookieValue!);
-      }
-      
       objParams = method.GetParameters()
             .Select((p, i) => Convert.ChangeType(objParams?[i], p.ParameterType)).ToList();
 
       var task = (Task)method.Invoke(Activator.CreateInstance(controller), objParams.ToArray()) as dynamic;
       IActionResult? returnedValue = await task!;
-      
-      //TODO переделать под IActionResult
-      /*buffer = returnedValue switch
-      {
-         not null => Encoding.ASCII.GetBytes(JsonSerializer.Serialize(returnedValue)),
-         null when method.Name is "GetAccounts" or "GetAccountInfo" 
-            => Encoding.ASCII.GetBytes("401 - not authorized"),
-         null => Encoding.ASCII.GetBytes("404 - not found")
-      };*/
-      
-      response.ContentLength64 = returnedValue.Buffer.Length;
-
-      /*ResponseInfo = returnedValue switch
-      {
-         not null when method.Name is "Login" => GetLoginResponse(returnedValue, buffer),
-         null when method.Name is "GetAccounts" or "GetAccountInfo" => 
-            new Response {Buffer = buffer, Content = "Application/json", StatusCode = HttpStatusCode.Unauthorized},
-         _ => new Response {Buffer = buffer, Content = "Application/json", StatusCode = HttpStatusCode.OK}
-      };*/
-      response.Headers.Set(HttpResponseHeader.ContentType, returnedValue.ContentType);
-      response.StatusCode = (int) returnedValue.StatusCode;
-      await using var output = response.OutputStream;
-      await output.WriteAsync(returnedValue.Buffer);
-      return true;
-   }
-
-   private static Response GetLoginResponse(object returnedValue, byte[] bytes)
-   {
-      var sessionId = (SessionId) returnedValue;
-      var cookie = new Cookie("SessionId",
-         $"Guid={sessionId.Guid}");
-      return new Response { Buffer = bytes, Content = "Application/json", StatusCode = HttpStatusCode.OK, Cookie = cookie};
+      return returnedValue;
    }
    
    private static async Task<IEnumerable<string>> GetQueryStringAsync(HttpListenerRequest request)
    {
-      //TODO разобраться, почему пустая строка приходит...
       var body = request.InputStream;
       var encoding = request.ContentEncoding;
       using var reader = new StreamReader(body, encoding);
@@ -246,10 +196,11 @@ public class HttpServer : IDisposable
    }
 
    private static IEnumerable<string> ParseQuery(string query)
-      => query.Split('&').Select(element => element.Split('=')[^1]);
-      
-   
-   
-   
-   public void Dispose() => Stop();
+      => query.Split('&')
+         .Select(element => element.Split('=')[^1].Replace("%40", "@").Replace("%2B","+"));
+
+   public void Dispose()
+   {
+      Stop();
+   }
 }

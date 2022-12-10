@@ -8,24 +8,23 @@ public class SessionManager
     private static MemoryCache _cache = new MemoryCache(new MemoryCacheOptions());
     private static ConcurrentDictionary<object, SemaphoreSlim> _locks = new ();
  
-    public static async Task<Guid?> GetOrAdd(string email, int id)
+    public static async Task<Session?> GetOrAdd(string email, int id, Guid guid)
     {
-        var session = new Session(Guid.NewGuid(), id, email);
-        if (!_cache.TryGetValue(session.Guid, out Session? cacheEntry))
+        if (!_cache.TryGetValue(guid, out Session? cacheEntry))
         {
-            var myLock = _locks.GetOrAdd(session.Guid, new SemaphoreSlim(1, 1));
+            var myLock = _locks.GetOrAdd(id, new SemaphoreSlim(1, 1));
  
             await myLock.WaitAsync();
             try
             {
-                if (!_cache.TryGetValue(session.Guid, out cacheEntry))
+                if (!_cache.TryGetValue(guid, out cacheEntry))
                 {
-                    cacheEntry = session;
+                    cacheEntry = new Session(guid, id, email);
                     var cacheEntryOptions =
                         new MemoryCacheEntryOptions()
                             .SetSlidingExpiration(TimeSpan.FromDays(3))
-                            .SetAbsoluteExpiration(TimeSpan.FromMinutes(3));
-                    _cache.Set(email, cacheEntry, cacheEntryOptions);
+                            .SetAbsoluteExpiration(TimeSpan.FromDays(1));
+                    _cache.Set(guid, cacheEntry, cacheEntryOptions);
                 }
             }
             finally
@@ -33,7 +32,7 @@ public class SessionManager
                 myLock.Release();
             }
         }
-        return cacheEntry?.Guid;
+        return cacheEntry;
     }
 
     public static async Task<bool> CheckSession(Guid guid)
@@ -43,6 +42,6 @@ public class SessionManager
     }
 
     public static async Task<Session?> GetInfo(Guid guid)
-        => await Task.FromResult(_cache.Get<Session>(guid));
+        => (Session)(await Task.FromResult(_cache.Get(guid)))!;
     
 }

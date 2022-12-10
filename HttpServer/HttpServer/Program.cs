@@ -6,18 +6,16 @@ using HttpServer;
 
 namespace HttpServer
 {
-    class Program
+    internal static class Program
     {
-        
-        static async Task Main(string[] args)
+        private static async Task Main(string[] args)
         {
-            using (HttpServer server = new HttpServer())
+            using (var server = new HttpServer())
             {
-                RequestHandler handler = new RequestHandler(server);
-                handler.KeepRunning = true;
-                handler.HandleRequests("start");
+                var handler = new RequestHandler(server) {KeepRunning = true};
+                await handler.HandleRequests("start");
                 while (handler.KeepRunning)
-                    handler.HandleRequests(Console.ReadLine()?.ToLower());
+                    await handler.HandleRequests(Console.ReadLine()?.ToLower());
             }
             Console.Read();
             Console.Clear();

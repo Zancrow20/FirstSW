@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AniWatch</title>
+    <link rel="stylesheet" href="/css/style.min.css" type="text/css">
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <link rel="stylesheet" href="/css/reset.css" type="text/css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <script src="https://kit.fontawesome.com/5a2eab6f6d.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    
+    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
+</head>
+<body>
+<!-- Header Section Begin -->
+<header class="header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-2">
+                <div class="header_logo">
+                    <a href="/anime/all/">
+                        <img src="/icons/AnimeLogo.png" alt="AnimeLogo.png" height="44" width="120">
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="header_nav">
+                    <nav class="header_menu mobile-menu">
+                        <ul>
+                            <li class="active"><a href="/anime/all/ ">Homepage</a></li>
+                            <li><a href="/anime/random/">Random Anime</a></li>
+                            <li><a href="/anime/completed/">Completed</a></li>
+                            <li><a href="/anime/ongoing/">Ongoing</a></li>
+                            <li><a href="/anime/best/">The best</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            <div class="col-lg-2">
+                <div class="header_right">
+                    <a href="/accounts/login-page/">
+                            <span class="header_right_profile">
+                                <img src="/icons/user.png" alt="icon_profile.png">
+                            </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+<section class="anime-details spad">
+    <div class="container">
+        <div class="anime__details__content">
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="product__item" id="{{Anime.Anime_Name}}">
+                        <div class="product__item__pic set-bg" style="background-image: url('/img/poster/{{Anime.Image_Path}}')">
+                            <div class="rating"><i class="fa-solid fa-star"></i>{{Anime.Average_Rating}}</div>
+                            <div class="count-of-estimations"><i class="fa-solid fa-thumbs-up"></i>{{Anime.Count_Of_Estimations}}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-9">
+                    <div class="anime__details__text">
+                        <div class="anime__details__title">
+                            <h3> {{Anime.Anime_Name}}</h3>
+                        </div>
+                        <div class="anime__details__rating">
+                            <div class="anime-rating">
+                                {{Anime.Average_Rating}}
+                                <a href="#"><i class="fa fa-star"></i></a>
+                            </div>
+                            <span> {{Anime.Count_Of_Estimations}} Votes</span>
+                        </div>
+                        <p>{{Info.Description}}</p>
+                        <div class="anime__details__widget">
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6">
+                                    <ul>
+                                        <li><span>Type: </span>
+                                            {{ if Info.Type == "S" }} 
+                                                TV Series 
+                                            {{ else }}
+                                                Film
+                                            {{ end }}
+                                        </li>
+                                        <li><span>Studios:</span> {{ Info.Studio }}</li>
+                                        <li><span>Release:</span> {{ Info.Date_Of_Release }} </li>
+                                        <li><span>Status: </span>
+                                            {{ if Info.Is_Ongoing}}
+                                                Ongoing
+                                            {{ else }}
+                                                Completed
+                                            {{ end }}
+                                        </li>
+                                        <li><span>Genre:</span> {{ Info.Genre }}</li>
+                                    </ul>
+                                </div>
+                                <div class="col-lg-6 col-md-6">
+                                    <ul>
+                                        <li><span>Rating:</span> {{ Anime.Average_Rating }}</li>
+                                        <li><span>Count of episodes:</span> {{ Info.Count_Of_Episodes }}</li>
+                                        <li><span>Quality:</span> HD</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="anime__details__btn">
+                            <a href="#" class="follow-btn"><i class="fa fa-heart-o"></i> Follow</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-8 offset-md-3">
+                <video
+                        id="my-video"
+                        class="video-js"
+                        controls
+                        preload="auto"
+                        style="width:600px;height:450px; margin-bottom: 50px"
+                >
+                    <source src="https://rr2---sn-8ph2xajvh-31oe.googlevideo.com/videoplayback?expire=1670688305&ei=0VmUY5nlMMOC6dsPlbKyUA&ip=216.131.68.5&id=o-AJyefYZn-9BjlBxOFfzZUtGD23tKARoAyNTAJgG2zkMQ&itag=18&source=youtube&requiressl=yes&spc=SFxXNhJAEMWIYjOURMvFgWd2IYKe2WE&vprv=1&mime=video%2Fmp4&ns=swc5zS99_nE_vLkLmAlmvi4J&cnr=14&ratebypass=yes&dur=212.091&lmt=1665516961425965&fexp=24001373,24007246&c=WEB&txp=4530434&n=gCzlW7XZlJv9lQ&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cspc%2Cvprv%2Cmime%2Cns%2Ccnr%2Cratebypass%2Cdur%2Clmt&sig=AOq0QJ8wRQIhAJT7NKW_ORYzAn1dpQg6bdmNaY34JhdyGkGSN0qHzL3PAiATRY32JTELMuAZUAthq_R7n6JLWbOXD0JlURobfpWy4w%3D%3D&redirect_counter=1&rm=sn-4g5e6z7s&req_id=e97c8beb3e5fa3ee&cms_redirect=yes&cmsv=e&ipbypass=yes&mh=7c&mip=178.213.240.40&mm=31&mn=sn-8ph2xajvh-31oe&ms=au&mt=1670669112&mv=m&mvi=2&pl=24&lsparams=ipbypass,mh,mip,mm,mn,ms,mv,mvi,pl&lsig=AG3C_xAwRgIhANTkb8P6lh_gxaxFCMz4Bv9TQYz0sdJouFttW3SbW-ScAiEA64AtILLMQyQvAZRN-MTsI4LAtaLb4e_X4l-pi6W_AmY%3D" type="video/mp4" />
+                    <source src="MY_VIDEO.webm" type="video/webm" />
+                    <p class="vjs-no-js">
+                        To view this video please enable JavaScript, and consider upgrading to a
+                        web browser that
+                        <a href="https://videojs.com/html5-video-support/" target="_blank"
+                        >supports HTML5 video</a
+                        >
+                    </p>
+                </video>
+                <div class="anime__details__episodes">
+                    <div class="section-title">
+                        <h5>List Name</h5>
+                    </div>
+                    {{- for $i in 1..Info.Count_Of_Episodes }}
+                    <a href="#">Ep {{ $i }}</a>
+                    {{- end }}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-8 col-md-8">
+                <div class="anime__details__review">
+                    <div class="section-title">
+                        <h5>Reviews</h5>
+                    </div>
+                    <div class="anime__review__item">
+                        <div class="anime__review__item__pic">
+                            <img src="img/anime/review-1.jpg" alt="">
+                        </div>
+                        <div class="anime__review__item__text">
+                            <h6>Chris Curry - <span>1 Hour ago</span></h6>
+                            <p>whachikan Just noticed that someone categorized this as belonging to the genre
+                                "demons" LOL</p>
+                        </div>
+                    </div>
+                    <div class="anime__review__item">
+                        <div class="anime__review__item__pic">
+                            <img src="img/anime/review-2.jpg" alt="">
+                        </div>
+                        <div class="anime__review__item__text">
+                            <h6>Lewis Mann - <span>5 Hour ago</span></h6>
+                            <p>Finally it came out ages ago</p>
+                        </div>
+                    </div>
+                    <div class="anime__review__item">
+                        <div class="anime__review__item__pic">
+                            <img src="img/anime/review-3.jpg" alt="">
+                        </div>
+                        <div class="anime__review__item__text">
+                            <h6>Louis Tyler - <span>20 Hour ago</span></h6>
+                            <p>Where is the episode 15 ? Slow update! Tch</p>
+                        </div>
+                    </div>
+                    <div class="anime__review__item">
+                        <div class="anime__review__item__pic">
+                            <img src="img/anime/review-4.jpg" alt="">
+                        </div>
+                        <div class="anime__review__item__text">
+                            <h6>Chris Curry - <span>1 Hour ago</span></h6>
+                            <p>whachikan Just noticed that someone categorized this as belonging to the genre
+                                "demons" LOL</p>
+                        </div>
+                    </div>
+                    <div class="anime__review__item">
+                        <div class="anime__review__item__pic">
+                            <img src="img/anime/review-5.jpg" alt="">
+                        </div>
+                        <div class="anime__review__item__text">
+                            <h6>Lewis Mann - <span>5 Hour ago</span></h6>
+                            <p>Finally it came out ages ago</p>
+                        </div>
+                    </div>
+                    <div class="anime__review__item">
+                        <div class="anime__review__item__pic">
+                            <img src="img/anime/review-6.jpg" alt="">
+                        </div>
+                        <div class="anime__review__item__text">
+                            <h6>Louis Tyler - <span>20 Hour ago</span></h6>
+                            <p>Where is the episode 15 ? Slow update! Tch</p>
+                        </div>
+                    </div>
+                    {{-for comment in Comments}}
+                    <div class="anime__review__item">
+                        <div class="anime__review__item__pic">
+                            <img src="img/anime/review-6.jpg" alt="">
+                        </div>
+                        <div class="anime__review__item__text">
+                            <h6>{{comment.Username}} - <span>20 Hour ago</span></h6>
+                            <p>{{comment.Comment_Value}}</p>
+                        </div>
+                    </div>
+                    {{- end}}
+                    <div id="your-comment">
+                        
+                    </div>
+                </div>
+                <div class="anime__details__form">
+                    <div class="section-title">
+                        <h5>Your Comment</h5>
+                    </div>
+                    <form>
+                        <textarea id="my-comment" placeholder="Your Comment"></textarea>
+                        <button id="submit-comment" type="button"><i class="fa fa-location-arrow"></i> Review</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<footer class="footer">
+    <div class="page-up">
+        <a href="#" id="scrollToTopButton"><i class="fa-solid fa-arrow-up"></i></a>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="footer__logo">
+                    <a href="/anime/all/"><img src="/icons/AnimeLogo.png" alt=""></a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="footer__nav">
+                    <ul>
+                        <li class="active"><a href="/anime/all/">Homepage</a></li>
+                        <li><a href="/anime/ongoing/">Ongoing</a></li>
+                        <li><a href="/anime/best/">Best</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <p><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                    Copyright ©<script>document.write(new Date().getFullYear());</script>2022 All rights reserved | This template is made with <i class="fa fa-heart" aria-hidden="true"></i> by <a href="/anime/all/" target="_blank">AnimeWatch</a>
+                    <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></p>
+
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("#submit-comment").click(function(){
+            console.log($("#my-comment").val)
+            $.ajax({
+                type : 'POST',
+                url : "/comment/ajax/",
+                data:{name:$("#my-comment").val(),
+                },
+                success: function(data){
+                    $("#your-comment").append(data);
+                }
+            })
+        })
+    })
+</script>
+
+<script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
+</body>
+</html>
